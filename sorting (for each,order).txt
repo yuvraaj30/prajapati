@@ -1,0 +1,34 @@
+ Aim :to execute Sort, group and filter command:
+
+Steps/code
+1.	Download covid 19 data from Kaggle. Clean the data. Save as (csv file)
+2.	Load data in pig storage
+3.	Display data 
+Perform following task:
+
+data1 = LOAD 'C:\\Users\\sagar\\Download\\data.csv' USING PigStorage(',')
+   as (Country_Region:chararray, Continent:chararray, Population:long, TotalCases:long, TotalDeaths:long, TotalRecovered:long, TotalCasesPer1M:double, DeathPer1M:double);
+
+Dump data1;
+
+To display the field name entered in schema
+DESCRIBE data1;
+
+To display the selected fields
+two = foreach data1 generate Country_Region, TotalDeaths, TotalRecovered;
+
+Identified the countries having less number of deaths. 
+data1_order = ORDER data1 BY death ASC;
+
+Identify the countries which have maximum number of recoveries
+data1_recover = ORDER data1 BY recovered DESC;
+
+Extract 10 countries whose death over 1 million population is maximum
+data1_deathpop = ORDER data1 BY deathpop DESC;
+data1_limit = LIMIT data1_deathpop 10;
+
+Filter data having cases per 1 million population is more than 1 lac
+data1_filter = FILTER data1 BY (casepop>100000);
+
+Group the countries continentwise:
+data1_group = GROUP data1 By continent; 

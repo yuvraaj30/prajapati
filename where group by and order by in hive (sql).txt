@@ -1,0 +1,51 @@
+-- 1. Create a new database
+CREATE DATABASE IF NOT EXISTS StudentRecords;
+USE StudentRecords;
+
+-- 2. Create a new table within the database
+CREATE TABLE Students (
+    student_id INT PRIMARY KEY,
+    first_name VARCHAR(50),
+    last_name VARCHAR(50),
+    age INT,
+    major VARCHAR(50)
+);
+
+-- 3. Insert values into the table
+INSERT INTO Students (student_id, first_name, last_name, age, major) VALUES
+(1, 'Alice', 'Smith', 20, 'Computer Science'),
+(2, 'Bob', 'Johnson', 21, 'Mathematics'),
+(3, 'Charlie', 'Williams', 19, 'Engineering'),
+(4, 'Diana', 'Brown', 22, 'Physics'),
+(5, 'Ethan', 'Davis', 20, 'Biology');
+
+-- 4. View the table
+SELECT * FROM Students;
+
+-- 5. Use the LIMIT command to display only the first 3 records
+SELECT * FROM Students LIMIT 3;
+
+-- 6. Sort the data by `age` in ascending order
+SELECT * FROM Students ORDER BY age;
+
+-- 7. Sort the data by `last_name` in descending order
+SELECT * FROM Students ORDER BY last_name DESC;
+
+-- 8. ORDER BY: Sort by `major` in ascending order and by `age` in descending order within each major
+SELECT * FROM Students
+ORDER BY major ASC, age DESC;
+
+-- 9. GROUP BY: Group students by `major` and count the number of students in each major
+SELECT major, COUNT(*) AS student_count
+FROM Students
+GROUP BY major;
+
+-- 10. CLUSTER BY (Hive-only command): Distribute rows into clusters by `age` and sort within each cluster
+-- (Note: This command is not supported in standard SQL; it works in Hive)
+-- SELECT * FROM Students CLUSTER BY age;
+
+-- 11. DROP TABLE: Remove the `Students` table from the database
+DROP TABLE IF EXISTS Students;
+
+-- 12. DROP DATABASE: Remove the `StudentRecords` database
+DROP DATABASE IF EXISTS StudentRecords;

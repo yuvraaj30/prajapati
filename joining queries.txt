@@ -1,0 +1,81 @@
+-- Create the database
+CREATE DATABASE company_assets;
+
+-- Use the new database
+USE company_assets;
+
+-- Create the departments table
+CREATE TABLE departments (
+    department_id INT PRIMARY KEY,
+    department_name VARCHAR(50)
+);
+
+-- Create the staff table
+CREATE TABLE staff (
+    staff_id INT PRIMARY KEY,
+    staff_name VARCHAR(50),
+    department_id INT,
+    FOREIGN KEY (department_id) REFERENCES departments(department_id)
+);
+
+-- Create the assets table
+CREATE TABLE assets (
+    asset_id INT PRIMARY KEY,
+    asset_model VARCHAR(50),
+    staff_id INT NULL,  -- Allow NULL for staff_id to avoid foreign key issues
+    FOREIGN KEY (staff_id) REFERENCES staff(staff_id)
+);
+
+-- Insert values into departments
+INSERT INTO departments (department_id, department_name) VALUES
+(1, 'Operations'),
+(2, 'Development'),
+(3, 'Marketing'),
+(4, 'Support'),
+(5, 'Logistics');
+
+-- Insert values into staff with valid department_ids or NULL
+INSERT INTO staff (staff_id, staff_name, department_id) VALUES
+(501, 'Aryan Sharma', 1),
+(502, 'Neha Gupta', 2),
+(503, 'Karan Patel', 2),
+(504, 'Ankita Roy', 3),
+(505, 'Sonia Jain', NULL),  -- NULL value for department
+(506, 'Rohan Mehta', 5);    -- Valid department_id now that department_id = 5 exists
+
+-- Insert values into assets with valid staff_ids or NULL
+INSERT INTO assets (asset_id, asset_model, staff_id) VALUES
+(601, 'Toyota Camry', 501),  -- Valid staff_id
+(602, 'Honda Civic', 502),   -- Valid staff_id
+(603, 'Ford Mustang', 503),  -- Valid staff_id
+(604, 'Chevrolet Malibu', NULL),  -- NULL value for staff
+(605, 'BMW X5', 506);        -- Valid staff_id
+
+-- INNER JOIN (returns only rows where staff have a matching department)
+SELECT staff.staff_id, staff.staff_name, departments.department_name
+FROM staff
+JOIN departments ON staff.department_id = departments.department_id;
+
+-- LEFT OUTER JOIN (returns all staff, including those without a matching department)
+SELECT staff.staff_id, staff.staff_name, departments.department_name
+FROM staff
+LEFT OUTER JOIN departments ON staff.department_id = departments.department_id;
+
+-- RIGHT OUTER JOIN (returns all departments, including those without matching staff)
+SELECT staff.staff_id, staff.staff_name, departments.department_name
+FROM staff
+RIGHT OUTER JOIN departments ON staff.department_id = departments.department_id;
+
+-- FULL OUTER JOIN equivalent using UNION (returns all staff and all departments)
+SELECT staff.staff_id, staff.staff_name, departments.department_name
+FROM staff
+LEFT JOIN departments ON staff.department_id = departments.department_id
+UNION
+SELECT staff.staff_id, staff.staff_name, departments.department_name
+FROM staff
+RIGHT JOIN departments ON staff.department_id = departments.department_id;
+
+-- LEFT JOIN with assets (returns all staff, including those without an asset)
+SELECT staff.staff_name, assets.asset_model
+FROM staff
+LEFT OUTER JOIN assets ON staff.staff_id = assets.staff_id;

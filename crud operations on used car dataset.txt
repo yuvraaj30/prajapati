@@ -1,0 +1,64 @@
+// Step 1: Switch to the AutomobileCompany database and create the UsedCars collection
+use AutomobileCompany;
+db.createCollection("UsedCars");
+
+// Step 2: Insert initial car details into the UsedCars collection
+db.UsedCars.insertMany([
+    { Make: "Toyota", Price: 300000, Year: 2019, Kilometers: 20000, Colour: "White", City: "Dubai" },
+    { Make: "Land Rover", Price: 450000, Year: 2018, Kilometers: 15000, Colour: "Black", City: "Abu Dhabi" },
+    { Make: "Lamborghini", Price: 800000, Year: 2020, Kilometers: 5000, Colour: "Yellow", City: "Meydan City, Dubai" },
+    { Make: "Mercedes", Price: 380000, Year: 2019, Kilometers: 10000, Colour: "Silver", City: "Sharjah" },
+    { Make: "RAM", Price: 420000, Year: 2021, Kilometers: 12000, Colour: "Red", City: "Dubai" }
+]);
+
+// Step 3: Sort car details in ascending order by Kilometers
+db.UsedCars.find().sort({ Kilometers: 1 });
+
+// Step 4: Find cars with a Price between 200,000 and 400,000 AED
+db.UsedCars.find({ Price: { $gte: 200000, $lte: 400000 } });
+
+// Step 5: Rename the field "City" to "Location" for all documents
+db.UsedCars.updateMany({}, { $rename: { "City": "Location" } });
+
+// Step 6: Update the Location of Lamborghini from "Meydan City, Dubai" to "Saif Zone Sharjah"
+db.UsedCars.updateOne(
+    { Make: "Lamborghini", Location: "Meydan City, Dubai" },
+    { $set: { Location: "Saif Zone Sharjah" } }
+);
+
+// Step 7: Add a new car detail to the collection
+db.UsedCars.insertOne({
+    Make: "Honda", Price: 220000, Year: 2017, Kilometers: 25000, Colour: "Blue", Location: "Dubai"
+});
+
+// Step 8: Increase the price of Land Rover by AED 5000
+db.UsedCars.updateOne(
+    { Make: "Land Rover" },
+    { $inc: { Price: 5000 } }
+);
+
+// Step 9: Add a new field "Available" with the default status "Yes", then change to "Sold" if sold out
+db.UsedCars.updateMany(
+    {},
+    { $set: { Available: "Yes" } }
+);
+
+// Example: Mark Toyota as "Sold"
+db.UsedCars.updateOne(
+    { Make: "Toyota" },
+    { $set: { Available: "Sold" } }
+);
+
+// Step 10: Group the cars by their Year of make
+db.UsedCars.aggregate([
+    { $group: { _id: "$Year", cars: { $push: "$$ROOT" } } }
+]);
+
+// Step 11: Calculate the total price of all Mercedes cars
+db.UsedCars.aggregate([
+    { $match: { Make: "Mercedes" } },
+    { $group: { _id: null, total_price: { $sum: "$Price" } } }
+]);
+
+// Step 12: Delete the entry of the car "RAM" from the collection
+db.UsedCars.deleteOne({ Make: "RAM" });

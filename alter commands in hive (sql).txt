@@ -1,0 +1,55 @@
+-- 1. Create Database
+CREATE DATABASE IF NOT EXISTS EmployeeDB;
+
+-- 2. Display Databases
+SHOW DATABASES;
+
+-- Use the newly created database
+USE EmployeeDB;
+
+-- 3. Create Table in Database
+CREATE TABLE Employee (
+    Id INT,
+    Name STRING,
+    Salary FLOAT,
+    Department STRING
+);
+
+-- 4. Insert Values into Table
+INSERT INTO TABLE Employee VALUES 
+    (1201, 'Gopal', 45000, 'Technical Manager'),
+    (1202, 'Manisha', 45000, 'Proof Reader'),
+    (1203, 'Masthanvali', 40000, 'Technical Writer'),
+    (1204, 'Kiran', 40000, 'HR Admin'),
+    (1205, 'Kranthi', 30000, 'Op Admin');
+
+-- 5. Display Tables in the Database
+SHOW TABLES;
+
+-- 6. Display Data of the Table
+SELECT * FROM Employee;
+
+-- 7. Alter Table
+-- Rename the table from `Employee` to `Emp`
+ALTER TABLE Employee RENAME TO Emp;
+
+-- Rename a column (Name to Ename) and change data type of Salary to DOUBLE
+ALTER TABLE Emp CHANGE Name Ename STRING;
+ALTER TABLE Emp CHANGE Salary Salary DOUBLE;
+
+-- Add a new column `joining_date` to the `Emp` table
+ALTER TABLE Emp ADD COLUMNS (joining_date STRING);
+
+-- Replace all columns in the table with new columns
+ALTER TABLE Emp REPLACE COLUMNS (
+    eid INT,
+    empid INT,
+    ename STRING,
+    name STRING
+);
+
+-- 8. Drop Table
+DROP TABLE IF EXISTS Emp;
+
+-- 9. Drop Database
+DROP DATABASE IF EXISTS EmployeeDB CASCADE;

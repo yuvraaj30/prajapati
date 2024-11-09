@@ -1,0 +1,32 @@
+-- 1. Create a new database
+CREATE DATABASE IF NOT EXISTS StudentRecords;
+USE StudentRecords;
+
+-- 2. Create a new table within the database
+CREATE TABLE Students (
+    student_id INT PRIMARY KEY,
+    first_name VARCHAR(50),
+    last_name VARCHAR(50),
+    age INT,
+    major VARCHAR(50)
+);
+
+-- 3. Insert values into the table
+INSERT INTO Students (student_id, first_name, last_name, age, major) VALUES
+(1, 'Alice', 'Smith', 20, 'Computer Science'),
+(2, 'Bob', 'Johnson', 21, 'Mathematics'),
+(3, 'Charlie', 'Williams', 19, 'Engineering'),
+(4, 'Diana', 'Brown', 22, 'Physics'),
+(5, 'Ethan', 'Davis', 20, 'Biology');
+
+-- 4. View the table
+SELECT * FROM Students;
+
+-- 5. Use the LIMIT command to display only the first 3 records
+SELECT * FROM Students LIMIT 3;
+
+-- 6. Sort the data by `age` in ascending order
+SELECT * FROM Students ORDER BY age;
+
+-- 7. Sort the data by `last_name` in descending order
+SELECT * FROM Students ORDER BY last_name DESC;

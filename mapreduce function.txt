@@ -1,0 +1,71 @@
+// Step 1: Switch to or create the DSdb database
+use DSdb;
+
+// Step 2: Create collections "student" and "student1" in the DSdb database
+db.createCollection("student");
+db.createCollection("student1");
+
+// Step 3: Insert a single document into the "student" collection
+db.student.insertOne({ name: "John Doe", age: 22, CGPA: 8.5, branch: "Data Science" });
+
+// Step 4: Insert multiple documents into the "student" collection
+db.student.insertMany([
+    { name: "Alice", age: 21, CGPA: 7.9, branch: "Computer Science" },
+    { name: "Bob", age: 23, CGPA: 6.8, branch: "Mechanical Engineering" }
+]);
+
+// Step 5: Read all documents in the "student" collection
+db.student.find();
+
+// Step 6: Find documents with a specific field value (name is "John Doe")
+db.student.find({ name: "John Doe" });
+
+// Step 7: Display documents in a readable format
+db.student.find().pretty();
+
+// Step 8: Count the total number of documents in the "student" collection
+db.student.find().count();
+
+// Step 9: Sort documents in ascending order by age
+db.student.find().sort({ age: 1 });
+
+// Step 10: Sort documents in descending order by CGPA
+db.student.find().sort({ CGPA: -1 });
+
+// Step 11: Update one document to set the age of "John Doe" to 23
+db.student.updateOne({ name: "John Doe" }, { $set: { age: 23 } });
+
+// Step 12: Update multiple documents where the branch is "Data Science" to set CGPA to 9.0
+db.student.updateMany({ branch: "Data Science" }, { $set: { CGPA: 9.0 } });
+
+// Step 13: Add a new field "graduationYear" to all documents
+db.student.updateMany({}, { $set: { graduationYear: 2022 } });
+
+// Step 14: Rename the field "branch" to "department" for all documents
+db.student.updateMany({}, { $rename: { "branch": "department" } });
+
+// Step 15: Delete one document where the name is "Alice"
+db.student.deleteOne({ name: "Alice" });
+
+// Step 16: Delete multiple documents where the department is "Mechanical Engineering"
+db.student.deleteMany({ department: "Mechanical Engineering" });
+
+// Step 17: Drop the "student" collection (deletes all documents and the collection)
+db.student.drop();
+
+// Step 18: Drop the DSdb database entirely
+db.dropDatabase();
+
+// Step 19: Define map and reduce functions for MapReduce to sum CGPA by department
+var mapFunction = function() { emit(this.department, this.CGPA); };
+var reduceFunction = function(key, values) { return Array.sum(values); };
+
+// Step 20: Perform MapReduce to calculate the sum of CGPAs grouped by department
+db.student.mapReduce(mapFunction, reduceFunction, { out: "CGPA_Sum" });
+
+// Step 21: Use MapReduce to find the average CGPA of students older than 20
+db.student.mapReduce(
+    function() { emit(this.age, this.CGPA); },
+    function(key, values) { return Array.avg(values); },
+    { query: { age: { $gt: 20 } }, out: "Average_CGPA" }
+);

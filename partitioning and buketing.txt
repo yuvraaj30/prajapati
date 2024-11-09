@@ -1,0 +1,107 @@
+-- Create a new database
+CREATE DATABASE IF NOT EXISTS healthcare;
+
+-- Use the newly created database
+USE healthcare;
+
+-- Create the healthcare_products table (renamed from pharma_inventory)
+CREATE TABLE healthcare_products (
+    name VARCHAR(50),
+    price DOUBLE,
+    buildYear INT,
+    expiryYear INT,
+    company VARCHAR(50)
+);
+
+-- Insert values into the healthcare_products table
+INSERT INTO healthcare_products (name, price, buildYear, expiryYear, company) VALUES
+('Paracetamol', 125, 2019, 2023, 'J&J'),
+('Nimusulide', 254, 2017, 2021, 'Biotech'),
+('Penicillium', 212, 2019, 2022, 'Pfiser'),
+('Dettol', 220, 2022, 2024, 'Biotech'),
+('Risperdal', 300, 2021, 2025, 'J&J'),
+('Bcg', 199, 2020, 2023, 'Pfiser');
+
+-- Create a partitioned table using LIST partitioning (renamed from pharma_inventory_partitioned)
+CREATE TABLE healthcare_partitioned_products (
+    name VARCHAR(50),
+    price DOUBLE,
+    buildYear INT,
+    expiryYear INT,
+    company VARCHAR(50)
+) 
+PARTITION BY LIST COLUMNS(company) (
+    PARTITION p1 VALUES IN ('J&J'), 
+    PARTITION p2 VALUES IN ('Biotech'), 
+    PARTITION p3 VALUES IN ('Pfiser')
+);
+
+-- Insert data into the partitioned table
+INSERT INTO healthcare_partitioned_products (name, price, buildYear, expiryYear, company)  
+SELECT name, price, buildYear, expiryYear, company
+FROM healthcare_products 
+WHERE company IN ('Pfiser', 'Biotech', 'J&J');
+
+-- Verify the data in the partitioned table
+SELECT * FROM healthcare_partitioned_products;
+
+-- Query to see data in Partition for p1 (J&J)
+SELECT * FROM healthcare_partitioned_products PARTITION (p1);
+
+-- Query to see data in Partition for p2 (Biotech)
+SELECT * FROM healthcare_partitioned_products PARTITION (p2);
+
+-- Query to see data in Partition for p3 (Pfiser)
+SELECT * FROM healthcare_partitioned_products PARTITION (p3);
+
+-- ---------------------------------------------
+-- Simulating Bucketing (Manual Distribution)
+-- ---------------------------------------------
+
+-- Create a table for "medkit" (renamed from medicines)
+CREATE TABLE medkit (
+    name VARCHAR(50),
+    price DOUBLE,
+    buildYear INT,
+    expiryYear INT,
+    company VARCHAR(50)
+);
+
+-- Insert values into the medkit table
+INSERT INTO medkit (name, price, buildYear, expiryYear, company) VALUES
+('Aspirin', 100, 2020, 2023, 'J&J'),
+('Ibuprofen', 150, 2021, 2024, 'Biotech'),
+('Amoxicillin', 200, 2019, 2023, 'Pfiser');
+
+-- Now simulate bucketing using company values
+-- Create a table to store the data in 3 buckets based on the company
+
+CREATE TABLE medkit_buckets (
+    name VARCHAR(50),
+    price DOUBLE,
+    buildYear INT,
+    expiryYear INT,
+    company VARCHAR(50)
+);
+
+-- Insert values into medkit_buckets (simulating bucketing by company using ASCII)
+-- Bucket 1 (ASCII % 3 = 0)
+INSERT INTO medkit_buckets (name, price, buildYear, expiryYear, company)
+SELECT name, price, buildYear, expiryYear, company 
+FROM medkit 
+WHERE (MOD(ASCII(LEFT(company, 1)), 3) = 0);  -- Bucket 1
+
+-- Bucket 2 (ASCII % 3 = 1)
+INSERT INTO medkit_buckets (name, price, buildYear, expiryYear, company)
+SELECT name, price, buildYear, expiryYear, company 
+FROM medkit 
+WHERE (MOD(ASCII(LEFT(company, 1)), 3) = 1);  -- Bucket 2
+
+-- Bucket 3 (ASCII % 3 = 2)
+INSERT INTO medkit_buckets (name, price, buildYear, expiryYear, company)
+SELECT name, price, buildYear, expiryYear, company 
+FROM medkit 
+WHERE (MOD(ASCII(LEFT(company, 1)), 3) = 2);  -- Bucket 3
+
+-- Result of Bucketing
+SELECT * FROM medkit_buckets;
